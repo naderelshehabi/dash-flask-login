@@ -84,6 +84,21 @@ logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
                    dcc.Link('Home', href='/')
                    ])  # end div
 
+# Callback function to login the user, or update the screen if the username or password are incorrect
+
+
+@app.callback(
+    Output('url_login', 'pathname'), Output('output-state', 'children'), [Input('login-button', 'n_clicks')], [State('uname-box', 'value'), State('pwd-box', 'value')])
+def login_button_click(n_clicks, username, password):
+    if n_clicks > 0:
+        if username == 'test' and password == 'test':
+            user = User(username)
+            login_user(user)
+            return '/success', ''
+        else:
+            return '/login', 'Incorrect username or password'
+
+
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
