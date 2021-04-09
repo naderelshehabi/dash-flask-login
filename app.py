@@ -1,3 +1,5 @@
+from flask import Flask
+
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -11,7 +13,13 @@ import dash_html_components as html
 # doing something wrong.
 # In this case, we're adding the elements through a callback, so we can ignore
 # the exception.
-app = dash.Dash(__name__, suppress_callback_exceptions=True)
+# Exposing the Flask Server to enable configuring it for logging in
+server = Flask(__name__)
+app = dash.Dash(__name__, server=server,
+                title='Example Dash login',
+                update_title='Loading...',
+                suppress_callback_exceptions=True)
+
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
