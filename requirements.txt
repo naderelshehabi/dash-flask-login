@@ -1,0 +1,4 @@
+dash
+ldap3
+flask-login
+python-dotenv
