@@ -160,7 +160,18 @@ def page_2_radios(value):
     return 'You have selected "{}"'.format(value)
 
 
+@app.callback(Output('user-status-div', 'children'), Output('login-status', 'data'), [Input('url', 'pathname')])
+def login_status(url):
+    ''' callback to display login/logout link in the header '''
+    if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated \
+            and url != '/logout':  # If the URL is /logout, then the user is about to be logged out anyways
+        return dcc.Link('logout', href='/logout'), current_user.get_id()
+    else:
+        return dcc.Link('login', href='/login'), 'loggedout'
+
 # Update the index
+
+
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
 def display_page(pathname):
