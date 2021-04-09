@@ -1,4 +1,7 @@
+import os
+
 from flask import Flask
+from flask_login import login_user, LoginManager, UserMixin, logout_user, current_user
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -19,6 +22,30 @@ app = dash.Dash(__name__, server=server,
                 title='Example Dash login',
                 update_title='Loading...',
                 suppress_callback_exceptions=True)
+
+# Updating the Flask Server configuration with Secret Key to encrypt the user session cookie
+server.config.update(SECRET_KEY=os.getenv('SECRET_KEY'))
+
+# Login manager object will be used to login / logout users
+login_manager = LoginManager()
+login_manager.init_app(server)
+login_manager.login_view = '/login'
+
+# User data model. It has to have at least self.id as a minimum
+
+
+class User(UserMixin):
+    def __init__(self, username):
+        self.id = username
+
+
+@ login_manager.user_loader
+def load_user(username):
+    ''' This function loads the user by user id. Typically this looks up the user from a user database.
+        We won't be registering or looking up users in this example, since we'll just login using LDAP server.
+        So we'll simply return a User object with the passed in username.
+    '''
+    return User(username)
 
 
 app.layout = html.Div([
