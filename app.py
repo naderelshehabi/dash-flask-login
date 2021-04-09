@@ -169,19 +169,49 @@ def login_status(url):
     else:
         return dcc.Link('login', href='/login'), 'loggedout'
 
-# Update the index
+# Main router
 
 
-@app.callback(Output('page-content', 'children'),
+@app.callback(Output('page-content', 'children'), Output('redirect', 'pathname'),
               [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/page-1':
-        return page_1_layout
+    ''' callback to determine layout to return '''
+    # We need to determine two things for everytime the user navigates:
+    # Can they access this page? If so, we just return the view
+    # Otherwise, if they need to be authenticated first, we need to redirect them to the login page
+    # So we have two outputs, the first is which view we'll return
+    # The second one is a redirection to another page is needed
+    # In most cases, we won't need to redirect. Instead of having to return two variables everytime in the if statement
+    # We setup the defaults at the beginning, with redirect to dash.no_update; which simply means, just keep the requested url
+    view = None
+    url = dash.no_update
+    if pathname == '/login':
+        view = login
+    elif pathname == '/success':
+        if current_user.is_authenticated:
+            view = success
+        else:
+            view = failed
+    elif pathname == '/logout':
+        if current_user.is_authenticated:
+            logout_user()
+            view = logout
+        else:
+            view = login
+            url = '/login'
+
+    elif pathname == '/page-1':
+        view = page_1_layout
     elif pathname == '/page-2':
-        return page_2_layout
+        if current_user.is_authenticated:
+            view = page_2_layout
+        else:
+            view = 'Redirecting to login...'
+            url = '/login'
     else:
-        return index_page
+        view = index_page
     # You could also return a 404 "URL not found" page here
+    return view, url
 
 
 if __name__ == '__main__':
