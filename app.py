@@ -99,9 +99,16 @@ def login_button_click(n_clicks, username, password):
             return '/login', 'Incorrect username or password'
 
 
+# Main Layout
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content')
+    dcc.Location(id='redirect', refresh=True),
+    dcc.Store(id='login-status', storage_type='session'),
+    html.Div(id='user-status-div'),
+    html.Br(),
+    html.Hr(),
+    html.Br(),
+    html.Div(id='page-content'),
 ])
 
 
