@@ -48,6 +48,42 @@ def load_user(username):
     return User(username)
 
 
+# User status management views
+
+
+# Login screen
+login = html.Div([dcc.Location(id='url_login', refresh=True),
+                  html.H2('''Please log in to continue:''', id='h1'),
+                  dcc.Input(placeholder='Enter your username',
+                            type='text', id='uname-box'),
+                  dcc.Input(placeholder='Enter your password',
+                            type='password', id='pwd-box'),
+                  html.Button(children='Login', n_clicks=0,
+                              type='submit', id='login-button'),
+                  html.Div(children='', id='output-state'),
+                  html.Br(),
+                  dcc.Link('Home', href='/')])
+
+# Successful login
+success = html.Div([html.Div([html.H2('Login successful.'),
+                              html.Br(),
+                              dcc.Link('Home', href='/')])  # end div
+                    ])  # end div
+
+# Failed Login
+failed = html.Div([html.Div([html.H2('Log in Failed. Please try again.'),
+                             html.Br(),
+                             html.Div([login]),
+                             dcc.Link('Home', href='/')
+                             ])  # end div
+                   ])  # end div
+
+# logout
+logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
+                   html.Br(),
+                   dcc.Link('Home', href='/')
+                   ])  # end div
+
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
