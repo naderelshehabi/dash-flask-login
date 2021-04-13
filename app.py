@@ -2,6 +2,7 @@ import os
 
 from flask import Flask
 from flask_login import login_user, LoginManager, UserMixin, logout_user, current_user
+from ldap3 import Server, Connection, ALL
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -91,12 +92,23 @@ logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
     Output('url_login', 'pathname'), Output('output-state', 'children'), [Input('login-button', 'n_clicks')], [State('uname-box', 'value'), State('pwd-box', 'value')])
 def login_button_click(n_clicks, username, password):
     if n_clicks > 0:
-        if username == 'test' and password == 'test':
-            user = User(username)
-            login_user(user)
-            return '/success', ''
-        else:
-            return '/login', 'Incorrect username or password'
+        ldap_server = Server(os.getenv("LDAP_SERVER"),
+                             use_ssl=True, get_info=ALL)
+        conn = Connection(ldap_server, username +
+                          '@' + os.getenv("LDAP_SERVER"), password, auto_bind=False, raise_exceptions=False)
+        try:
+            conn.bind()
+            if conn.result['result'] == 0:  # Successful
+                user = User(username)
+                login_user(user)
+                return '/success', ''
+            elif conn.result['result'] == 49:  # Invalid credentials
+                return dash.no_update, 'Incorrect username or password'
+        except Exception as e:
+            return dash.no_update, f'ERROR: {str(e)}'
+        finally:
+            if conn.bound:
+                conn.unbind()
 
 
 # Main Layout
