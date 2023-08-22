@@ -5,8 +5,8 @@ from flask_login import login_user, LoginManager, UserMixin, logout_user, curren
 
 import dash
 from dash.dependencies import Input, Output, State
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 
 # CREDIT: This code is copied from Dash official documentation:
 # https://dash.plotly.com/urls
@@ -88,7 +88,7 @@ logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
 
 
 @app.callback(
-    Output('url_login', 'pathname'), Output('output-state', 'children'), [Input('login-button', 'n_clicks')], [State('uname-box', 'value'), State('pwd-box', 'value')])
+    [Output('url_login', 'pathname'), Output('output-state', 'children')], [Input('login-button', 'n_clicks')], [State('uname-box', 'value'), State('pwd-box', 'value')])
 def login_button_click(n_clicks, username, password):
     if n_clicks > 0:
         if username == 'test' and password == 'test':
@@ -97,6 +97,8 @@ def login_button_click(n_clicks, username, password):
             return '/success', ''
         else:
             return '/login', 'Incorrect username or password'
+    
+    return dash.no_update, dash.no_update  # Return a placeholder to indicate no update
 
 
 # Main Layout
